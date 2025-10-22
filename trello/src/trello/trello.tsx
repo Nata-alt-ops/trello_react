@@ -46,14 +46,12 @@ export const Trello = () => {
     const[newcard, setNewCard] = useState('');
 
     const addCard =() =>{
-        if (newcard.trim() === '') return;
 
         const newCard: Card = {
             id:card.length > 0 ? Math.max(...card.map(u => u.id))+1:1,
-            title:newcard.trim()
+            title: `Card ${card.length + 1}`
         };
         setCard([...card, newCard]);
-        setNewCard('')
     };
 
     //перетаскивание карт
@@ -64,7 +62,7 @@ export const Trello = () => {
     };
 
     const handleDrop = (e:any, targetId: number) =>{
-        e.preventDefailt();
+        e.preventDefault();
 
         if (draggedCard === null || draggedCard === targetId) return;
 
@@ -87,18 +85,31 @@ export const Trello = () => {
             <button onClick={addCard}>Добавить карту</button>
         </div>
         <div className="trello_cards">
-            {card.map((card, cardIndex) =>(
-                <div key={card.id}
-                className="card">
+            {card.map((cardItem) =>(
+                <div key={cardItem.id}
+                className="card"
+                draggable
+                onDragStart={() => handleDragStart(cardItem.id)}
+                onDragOver={(e) => e.preventDefault()}
+                onDrop={(e) => handleDrop(e, cardItem.id)}
+                >
                     <div className="card_header d-flex justify-content-between align-items-center flex-row">
                         <div className="drag_title d-flex flex-row">
                             <svg xmlns="http://www.w3.org/2000/svg" width="36" height="36" fill="#000000" viewBox="0 0 256 256"><path d="M188,82a25.85,25.85,0,0,0-14.59,4.49A26,26,0,0,0,128,75.41,26,26,0,0,0,82,92v22H68a26,26,0,0,0-26,26v12a86,86,0,0,0,172,0V108A26,26,0,0,0,188,82Zm14,70a74,74,0,0,1-148,0V140a14,14,0,0,1,14-14H82v26a6,6,0,0,0,12,0V92a14,14,0,0,1,28,0v28a6,6,0,0,0,12,0V92a14,14,0,0,1,28,0v28a6,6,0,0,0,12,0V108a14,14,0,0,1,28,0Z">
                                 </path></svg>
-                            <h1>{card.title}</h1>
+                            <h1>{cardItem.title}</h1>
                         </div>
                        
-                        <div className="options"  onClick={(e) => {e.stopPropagation(); DeleteCard(card.id);}}>
-                            ...
+                        <div className="options" >
+                            <div className="dropdown">
+                                <button className="btn btn-secondary " type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+
+                                </button>
+                                <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton1">
+                                    <div className="dropdown-item">Переменовать</div>
+                                    <div className="dropdown-item" onClick={(e) => {e.stopPropagation(); DeleteCard(cardItem.id);}}>Удалить </div>
+                                </ul>
+                            </div>
                         </div>
                         </div>
                 </div>
