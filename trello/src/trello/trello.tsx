@@ -86,7 +86,8 @@ export const Trello = () => {
         </div>
         <div className="trello_cards">
             {card.map((cardItem) =>(
-                <div key={cardItem.id}
+                <div key={cardItem.id} 
+                
                 className="card"
                 draggable
                 onDragStart={() => handleDragStart(cardItem.id)}
