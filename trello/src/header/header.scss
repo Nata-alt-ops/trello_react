@@ -1,0 +1,74 @@
+.header{
+    position: fixed;
+    width: 100%;
+    height: 45px;
+    background-color: #026aa7;
+    border-bottom: 2px solid #005a8a;
+    padding: 8px 12px;
+
+    .board_project{
+        width: 100%;
+        height: auto;
+        gap: 10px;
+
+        .board{
+            width: 76px;
+            height: 28px;
+            background-color: #3588b9;
+            padding: 8px 4px;
+            border-radius: 4px;
+            gap:5px;
+            cursor: pointer;
+
+            .restangle{
+                background-color: #72acce;
+                width: 20px;
+                height: 20px;
+                border-radius: 4px;
+            }
+
+            p{
+            color: #fff;
+            font-size: 14px;
+            margin: 0;
+            }
+
+            &:hover{
+                background-color: #3a94c9;
+            }
+        }
+        .line{
+            background-color: #3588b9;
+            width: 1px;
+            height: 16px;
+
+        }
+        h1{
+            font-size: 16px;
+            color: #fff;
+            font-weight: 400;
+            margin: 0;
+
+        }
+    }
+    button{
+        width: 155px;
+        padding: 12px 4px;
+        height: 30px;
+        gap:5px;
+        background-color: #3588b9;
+        border: none;
+        border-radius: 4px;
+
+        p{
+            font-size: 14px;
+            font-weight: 400;
+            color: #fff;
+            margin: 0;
+        }
+
+        &:hover{
+                background-color: #3a94c9;
+            }
+    }
+}
