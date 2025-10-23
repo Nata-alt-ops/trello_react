@@ -27,7 +27,9 @@ export const Trello = () => {
             {
                 id:1,
                 title:'To do',
-                tasks: []
+                tasks: [
+                    { id: 1, title:'Помыть кота', tag:'Bug'}
+                ]
             },
             {
                 id:2,
@@ -112,11 +114,14 @@ export const Trello = () => {
         }
     };
 
+    //добавление задачи
+       const addTask = (cardId: number) => {
+        console.log(`Добавить задачу в карту ${cardId}`);
+        // Здесь будет логика добавления задачи
+    };
+
  return(
     <div className="trello_board">
-        <div className="add_card">
-            <button onClick={addCard}>Добавить карту</button>
-        </div>
         <div className="trello_cards">
             {card.map((cardItem) =>(
                 <div key={cardItem.id} 
@@ -137,7 +142,7 @@ export const Trello = () => {
                                 autoFocus/></div>
                             ): ( <h1 onClick={() => handleCardTitleClick(cardItem)}
                             onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#ffffff'}
-                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor='transparent'}>{cardItem.title}</h1>)}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor='pink'}>{cardItem.title}</h1>)}
                         </div>
                        
                         <div className="options" >
@@ -151,10 +156,44 @@ export const Trello = () => {
                                 </ul>
                             </div>
                         </div>
-                        </div>
+                    </div>
+
+                     {/* Область для задач */}
+                    <div className="tasks-area">
+                        {cardItem.tasks && cardItem.tasks.length > 0 ? (
+                            <div className="tasks-list">
+                                {cardItem.tasks.map((task) => (
+                                    <div key={task.id} className="task-item">
+                                        <div className="task-content">
+                                            <span className="task-title">{task.title}</span>
+                                            {task.tag && <span className="task-tag">{task.tag}</span>}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="no-tasks">
+                                <p>Задач пока нет</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Кнопка добавления задачи */}
+                    <div className="add-task-footer">
+                        <button 
+                            className="btn btn-primary btn-sm add-task-btn"
+                            onClick={() => addTask(cardItem.id)}
+                        >
+                            + Добавить задачу
+                        </button>
+                    </div>
                 </div>
             ))}
+            <div className="add_card">
+            <button onClick={addCard}>Добавить карту</button>
         </div>
+        </div>
+        
     </div>
  )
 };
