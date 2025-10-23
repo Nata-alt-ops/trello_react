@@ -99,6 +99,19 @@ export const Trello = () => {
         setEditCardId(null)
     };
 
+    const handleCardTitleClick = (cardItem: Card) =>{
+        EditCardTitle(cardItem);
+    }
+      const handleInputBlur = () => {
+        SaveNewCardTitle();
+    };
+
+    const handleKeyPress = (e:any) =>{
+        if (e.key === 'Enter'){
+            SaveNewCardTitle();
+        }
+    };
+
  return(
     <div className="trello_board">
         <div className="add_card">
@@ -119,13 +132,12 @@ export const Trello = () => {
                             {editCardId === cardItem.id ? (
                                 <div className="edit-input">
                                 <input type="text" value={editCard} onChange={(e) => setEditCard(e.target.value)}
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter'){
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        SaveNewCardTitle();}}}/>
-                                <button onClick={(e) => {e.stopPropagation(); SaveNewCardTitle();}}>Изменить</button></div>
-                            ): ( <h1>{cardItem.title}</h1>)}
+                                onBlur={handleInputBlur}
+                                onKeyDown={handleKeyPress}
+                                autoFocus/></div>
+                            ): ( <h1 onClick={() => handleCardTitleClick(cardItem)}
+                            onMouseEnter={(e) => e.currentTarget.style.backgroundColor='#ffffff'}
+                            onMouseLeave={(e) => e.currentTarget.style.backgroundColor='transparent'}>{cardItem.title}</h1>)}
                         </div>
                        
                         <div className="options" >
