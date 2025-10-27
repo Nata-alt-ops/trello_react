@@ -7,7 +7,7 @@ export const Header = () => {
         <div className="header d-flex justify-content-between align-items-center">
             <div className="board_project d-flex justify-content-start align-items-center">
                 <div className="board d-flex justify-content-start align-items-center">
-                    <div className="restangle"></div>
+                    <div className="square"></div>
                     <p>Board</p>
                 </div>
                 <div className="line"></div>

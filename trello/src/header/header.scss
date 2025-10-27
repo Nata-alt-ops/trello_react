@@ -1,9 +1,88 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@300;400;500&display=swap');
+
+$font_main1:'Inter', sans-serif;
+$font_main2:'Roboto', sans-serif;
+
+$background_color: #026aa7;
+$border_header:#005a8a;
+$logo_background:#3588b9;
+$square:#72acce;
+$line:#3588b9;
+$title_color:#ffffff;
+$button_hover:#3a94c9;
+
+
+@mixin board{
+    width: 76px;
+    height: 28px;
+    background-color: $logo_background;
+    padding: 8px 4px;
+    border-radius: 4px;
+    gap:5px;
+    cursor: pointer;
+
+    .square{
+        background-color: $square;
+        width: 20px;
+        height: 20px;
+        border-radius: 4px;
+    }
+
+    p{
+        color: #fff;
+        font-size: 14px;
+        margin: 0;
+    }
+
+    &:hover{
+        background-color: #3a94c9;
+    }
+}
+
+@mixin line{
+    background-color: $line;
+    width: 1px;
+    height: 16px;
+}
+
+@mixin h1{
+    font-size: 16px;
+    color: $title_color;
+    font-weight: 400;
+    margin: 0;
+    font-family: $font_main1;
+}
+
+@mixin button{
+    width: 155px;
+    padding: 12px 4px;
+    height: 30px;
+    gap:5px;
+    background-color: $logo_background;
+    border: none;
+    border-radius: 4px;
+    font-family: $font_main1;
+
+    p{
+        font-size: 13px;
+        font-weight: 400;
+        color: $title_color;
+        margin: 0;
+        font-family: $font_main1;
+    }
+
+    &:hover{
+            background-color: $button_hover;
+        }
+
+}
+
 .header{
     position: fixed;
     width: 100%;
     height: 45px;
-    background-color: #026aa7;
-    border-bottom: 2px solid #005a8a;
+    background-color: $background_color;
+    border-bottom: 2px solid $border_header;
     padding: 8px 12px;
 
     .board_project{
@@ -12,63 +91,16 @@
         gap: 10px;
 
         .board{
-            width: 76px;
-            height: 28px;
-            background-color: #3588b9;
-            padding: 8px 4px;
-            border-radius: 4px;
-            gap:5px;
-            cursor: pointer;
-
-            .restangle{
-                background-color: #72acce;
-                width: 20px;
-                height: 20px;
-                border-radius: 4px;
-            }
-
-            p{
-            color: #fff;
-            font-size: 14px;
-            margin: 0;
-            }
-
-            &:hover{
-                background-color: #3a94c9;
-            }
+            @include board();
         }
         .line{
-            background-color: #3588b9;
-            width: 1px;
-            height: 16px;
-
+            @include line();
         }
         h1{
-            font-size: 16px;
-            color: #fff;
-            font-weight: 400;
-            margin: 0;
-
+            @include h1();
         }
     }
     button{
-        width: 155px;
-        padding: 12px 4px;
-        height: 30px;
-        gap:5px;
-        background-color: #3588b9;
-        border: none;
-        border-radius: 4px;
-
-        p{
-            font-size: 14px;
-            font-weight: 400;
-            color: #fff;
-            margin: 0;
-        }
-
-        &:hover{
-                background-color: #3a94c9;
-            }
+        @include button();
     }
 }

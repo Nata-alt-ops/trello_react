@@ -1,7 +1,174 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@300;400;500&display=swap');
+
+$font_main1:'Inter', sans-serif;
+$font_main2:'Roboto', sans-serif;
+$background_color: #0079bf;
+$card:#EBECEF;
+$card_title:#000;
+$card_input:#fd2323;
+$task:#ffffff;
+$shadow_task:#cccbcb;
+$no_task: #979a9e;
+
+
+$tags: (
+    'bug': #eb5a46,
+    'overdue': #61bd4f,
+    'urgent': #ff9f1a,
+    'low-priority': #f2d600,
+    'high-priority': #c377e0
+);
+
+
+@mixin card {
+    padding: 20px;
+    min-width: 302px;
+    max-width: 300px !important;
+    border-radius: 12px;
+    background-color: $card;
+    flex: 0 0 auto;
+}
+
+@mixin title_card{
+    h1{
+        font-size: 20px;
+        color: $card_title;
+        font-family: $font_main1;
+        font-weight: 600;
+    }
+}
+
+@mixin card_input{
+    display: inline;
+    input{
+        font-size: 20px !important;
+        color: $card_input;
+        font-family: $font_main1;
+        font-weight: 600;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        margin: 0;
+        width: 100%;
+    }
+}
+
+@mixin card_options{
+    button{
+        background-color: $card;
+        border:none;
+        svg{
+            fill: none;
+        }
+    }
+    .dropdown-menu{
+        padding: 5px;
+        width: auto !important;
+        min-width: auto !important;
+        white-space: nowrap;
+        .dropdown-item{
+            width: auto;
+            font-family: $font_main1;
+            font-size: 12px;
+        }
+
+    }
+    &:hover{
+        button{
+            cursor: pointer;
+            margin: 0;
+
+            svg{
+                fill: $card_title;
+
+            }
+        }
+
+    }
+}
+
+@mixin task{
+    background-color: $task;
+    border-radius: 10px;
+    padding: 10px;
+    margin-top: 7px;
+    box-shadow: 1px 12px 20px 0px $shadow_task;
+}
+
+@mixin tags{
+    padding: 3px;
+    font-size: 10px;
+    font-family: $font_main2;
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+
+@mixin task_input{
+    display: inline;
+    input{
+        font-size: 16px !important;
+        color: $card_input;
+        background: transparent;
+        border: none !important;
+        outline: none !important;
+        box-shadow: none !important;
+        width: auto;
+        font-family: $font_main2;
+    }
+}
+
+@mixin task_title{
+    color: $card_title;
+    cursor: pointer;
+    border-radius: 3px;
+    font-family: $font_main2;
+    font-weight: 400;
+    text-align: left;
+    display: block;
+    width: 100%;
+    padding: 4px;
+    
+    &:hover{
+        background-color: $task;
+    }
+}
+
+@mixin task_options{
+    color: $task;
+    font-size: 10px;
+    &:hover{
+        color: $card_title;
+    }
+}
+
+@mixin add_card{
+    button{
+        padding: 10px;
+        min-width: min-content;
+        min-height: min-content;
+        border-radius: 8px;
+        border:none;
+        background-color: $card;
+        text-align: left;
+        cursor: pointer;
+        color: $card_title;
+        
+        &:hover{
+            color: #3394cc;
+            background-color: $task;
+        }
+    }
+}
+
+body{
+    background-color: $background_color;
+    font-family: 'Inter', sans-serif;
+}
+
 .trello_board {
     width: 100%;
     height: 100%;
-    background-color: #0079bf;
     padding: 25px;
     display: flex;
     flex-direction: column;
@@ -13,161 +180,102 @@
         height: 100%;
         display: flex;
         flex-direction: row;
+        align-items: flex-start;
         flex-wrap: wrap;
         gap: 10px;
 
         .card{
-            padding: 20px;
-            min-width: 310px;
-            max-width: 310px !important;
-            border-radius: 12px;
-            background-color: #EBECEF;
-
+            @include card();
             .card_header{
                 .card_title{
-                    h1{
-                        font-size: 20px;
-                        color: #000;
-                        font-family:'Courier New', Courier, monospace;
-                    }
+                    @include title_card();
                     .edit_input{
-                        display: inline;
-                        input{
-                            font-size: 20px;
-                            color: #fd2323;
-                            font-family: 'Roboto';
-                            background: transparent;
-                            border: none !important;
-                            outline: none !important;
-                            box-shadow: none !important;
-                            margin: 0;
-                            width: auto;
-                        }
+                        @include card_input();
                     }
                 }
-
                 .options{
-                    button{
-                        background-color: #EBECEF;
-                        border:none;
-
-                        svg{
-                            fill: none;
-                        }
-                    }
-
-                    &:hover{
-                        button{
-                            cursor: pointer;
-                            margin: 0;
-
-                            svg{
-                                fill: #000000;
-
-                            }
-                        }
-
-                    }
-
+                    @include card_options();
                 }
             }
-
-            .tasks-area{
+            .tasks_area{
                 width: 100%;
+                height: auto;
+
                 .tasks-list{
                    width: 100%;
                    height: auto;
 
-                   .task-item{
-                    background-color: #ffffff;
-                    border-radius: 10px;
-                    padding: 10px;
-                    margin-top: 7px;
-                    box-shadow: 1px 12px 20px 0px #cccbcb;
+                    .task-item{
+                        @include task();
 
-                    .task-tags{
-                        width: 100%;
-                        height: 100%;
-                        display: flex;
-                        align-items: center;
-                        flex-direction: row;
-                        flex-wrap: wrap;
-                        gap: 5px;
-                        .task-tag{
-                            padding: 3px;
-                            font-size: 10px;
-                            font-family: 'Roboto';
-                            border-radius: 5px;
-                            margin-bottom: 5px;
-                            &.bug { background: #eb5a46; color: white; }
-                                    &.feature { background: #61bd4f; color: white; }
-                                    &.urgent { background: #ff9f1a; color: white; }
-                                    &.low-priority { background: #f2d600; color: white; }
-                                    &.high-priority { background: #c377e0; color: white; }
+                        .task-tags{
+                            width: 100%;
+                            height: 100%;
+                            display: flex;
+                            align-items: center;
+                            flex-direction: row;
+                            flex-wrap: wrap;
+                            gap: 5px;
+                            color: $task;
+
+                            .task-tag{
+                                @include tags();
+                                @each $name, $color in $tags{
+                                    &.#{$name} {
+                                        background: $color;
+                                    }
+                                }
+                            }
                         }
-                    }
-                   }
-
-
-
-                    
+                    } 
                 }
+                
+                .no-tasks{
+                    p{
+                        color: $no_task;
+                    }
+                }
+
                 .task-content{
-                        text-align: left; 
+                    text-align: left; 
 
                         .edit_input{
-                        display: inline;
-                        input{
-                            font-size: 20px;
-                            color: #fd2323;
-                            font-family: 'Roboto';
-                            background: transparent;
-                            border: none !important;
-                            outline: none !important;
-                            box-shadow: none !important;
-                            margin: 0;
-                            width: auto;
+                            @include task_input();
                         }
-                    }
+
                         .task-title{
-                            color: #000000; 
-                            text-align: left;
-                            display: block;
-                            width: 100%;
-                            cursor: pointer;
-                            padding: 4px;
-                            border-radius: 3px;
-                            
-                            &:hover{
-                                background-color: #ffffff;
-                            }
+                            @include task_title(); 
                         }
+
                     .task-options{
                         .task-dropdown-btn{
-                            color: #fff;
-
-                            &:hover{
-                                color: #000;
-                            }
+                            @include task_options();
                         }
                         .dropdown-menu{
                             .dropdown-menu-header{
                                 margin-left: 15px;
                             }
-                            
                         }
-                    }
-                    
-                    
-                }
-                
+                    } 
+                } 
             }
             .add-task-footer{
                 margin-top: 10px;
-                
+                border-radius: 6px;
+                cursor: pointer;
+
+                .add-task-btn{
+                    border: none;
+                    background: none;
+                    cursor: pointer;
+                }
             }
 
+        }
+        .add_card{
+            @include add_card();
+            height: fit-content;
+        }
     }
-    }
-    }
+}
 
