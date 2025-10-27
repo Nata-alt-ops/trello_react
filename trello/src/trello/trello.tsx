@@ -39,7 +39,7 @@ export const Trello = () => {
             tasks: [
                 { 
                     id: 1, 
-                    title: 'Щаурма', 
+                    title: 'Шаурма', 
                     tags: ['High Priority']
                 },
             ]
