@@ -439,7 +439,7 @@ export const Trello = () => {
                                                         <ul className={`dropdown-menu ${activeDropdown === `task-${task.id}` ? 'show' : ''}`}>
                                                             <li><div className="dropdown-menu-header">Добавить тег:</div></li>
                                                             {Tags.map(tag => (
-                                                                <li key={tag}>
+                                                                <li key={tag}> 
                                                                     <div className={`dropdown-item ${task.tags?.includes(tag) ? 'active' : ''}`}
                                                                         onClick={(e) => {
                                                                             e.stopPropagation();
