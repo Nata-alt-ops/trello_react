@@ -16,29 +16,33 @@ type Task = {
 }
 
 export const Trello = () => {
+
+    const randomId = () =>{
+        return Date.now() + Math.floor(Math.random() * 10000)
+    };
     const [card, setCard] = useState<Card[]>([
         {
-            id: 1,
+            id: randomId(),
             title: 'To do',
             tasks: [
                 { 
-                    id: 1, 
+                    id: randomId(), 
                     title: 'Суши', 
                     tags: ['Bug', 'Overdue', 'Urgent', 'Low Priority', 'High Priority']
                 },
                  { 
-                    id: 2, 
+                    id: randomId(), 
                     title: 'Онигири', 
                     tags: ['Low Priority']
                 }
             ]
         },
         {
-            id: 200,
+            id: randomId(),
             title: 'Done',
             tasks: [
                 { 
-                    id: 100, 
+                    id: randomId(), 
                     title: 'Шаурма', 
                     tags: ['High Priority']
                 },
@@ -57,7 +61,7 @@ export const Trello = () => {
     // добавление
     const addCard = () => {
         const newCard: Card = {
-            id: card.length > 0 ? Math.max(...card.map(u => u.id)) + 1 : 1,
+            id: randomId(),
             title: `Card ${card.length + 1}`,
             tasks: []
         };
@@ -139,11 +143,8 @@ export const Trello = () => {
     // добавление 
     const addTask = (cardId: number) => {
 
-        const generateTaskId = () => {
-            return Date.now() + Math.floor(Math.random() * 1000);
-        };
         const newTask: Task = {
-            id: generateTaskId(),
+            id: randomId(),
             title: 'Новая задача',
             tags: []
         };
@@ -314,11 +315,29 @@ export const Trello = () => {
         );
     };
 
-    // для меню(чтобы закрывалось)
+    
+
+    //для меню
+    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
+
+    const handleCardDropdownToggle = (cardId: number, e: any) => {
+        e.stopPropagation();
+        const dropdownId = `card-${cardId}`;
+        setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
+    };
+
+    const handleTaskDropdownToggle = (taskId: number, e: any) => {
+        e.stopPropagation();
+        const dropdownId = `task-${taskId}`;
+        setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
+    };
+
+   // для меню(чтобы закрывалось)
     const handleClickOutside = () => {
+        setActiveDropdown(null);
         setShowTagMenu(null);
     };
-    
+        
     return (
         <div className="trello_board" onClick={handleClickOutside}>
             <div className="trello_cards">
@@ -351,11 +370,11 @@ export const Trello = () => {
                             </div>
                             <div className="options">
                                 <div className="dropdown">
-                                    <button className="" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <button className="" type="button" data-bs-toggle="dropdown" aria-expanded={activeDropdown === `card-${cardItem.id}`}  onClick={(e) => handleCardDropdownToggle(cardItem.id, e)}>
                                         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" fill="none" viewBox="0 0 256 256"><path d="M144,128a16,16,0,1,1-16-16A16,16,0,0,1,144,128ZM60,112a16,16,0,1,0,16,16A16,16,0,0,0,60,112Zm136,0a16,16,0,1,0,16,16A16,16,0,0,0,196,112Z"></path></svg>
                                     </button>
-                                    <ul className="dropdown-menu">
-                                        <li><div className="dropdown-item" onClick={(e) => { e.stopPropagation(); DeleteCard(cardItem.id); }}>Удалить</div></li>
+                                    <ul className={`dropdown-menu ${activeDropdown === `card-${cardItem.id}` ? 'show' : ''}`}>
+                                        <li><div className="dropdown-item" onClick={(e) => { e.stopPropagation(); DeleteCard(cardItem.id); setActiveDropdown(null); }}>Удалить</div></li>
                                     </ul>
                                 </div>
                             </div>
@@ -413,11 +432,11 @@ export const Trello = () => {
                                                             className="btn btn-sm task-dropdown-btn"
                                                             type="button"
                                                             data-bs-toggle="dropdown"
-                                                            aria-expanded="false"
-                                                            onClick={(e) => e.stopPropagation()}>
+                                                            aria-expanded={activeDropdown === `task-${task.id}`}
+                                                              onClick={(e) => handleTaskDropdownToggle(task.id, e)}>
                                                             •••
                                                         </button>
-                                                        <ul className="dropdown-menu">
+                                                        <ul className={`dropdown-menu ${activeDropdown === `task-${task.id}` ? 'show' : ''}`}>
                                                             <li><div className="dropdown-menu-header">Добавить тег:</div></li>
                                                             {Tags.map(tag => (
                                                                 <li key={tag}>
@@ -438,6 +457,7 @@ export const Trello = () => {
                                                                     onClick={(e) => {
                                                                         e.stopPropagation();
                                                                         deleteTask(cardItem.id, task.id);
+                                                                         setActiveDropdown(null);
                                                                     }}>
                                                                     Удалить задачу
                                                                 </div>
