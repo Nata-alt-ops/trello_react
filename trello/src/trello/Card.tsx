@@ -1,65 +1,126 @@
 import React, { useState } from "react";
 import { Task } from "./Task";
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+
+type TaskType = {
+  id: number;
+  title: string;
+  tags: string[];
+}
+
+type CardProps = {
+  card: {
+    id: number;
+    title: string;
+    tasks: TaskType[];
+  };
+  onDeleteCard: (id: number) => void; //удаление
+  onEditCardTitle: (cardId: number, newTitle: string) => void; //редактирование
+  onAddTask: (cardId: number) => void; //добавление новой задачи
+  onEditTask: (taskId: number, newTitle: string) => void; //редактирование задачи
+  onDeleteTask: (taskId: number) => void; //удаление задачи
+  onToggleTag: (taskId: number, tag: string) => void; //теги
+  activeDropdown: string | null; 
+  onDropdownToggle: (type: 'card' | 'task', id: number, e: any) => void; //переключение меню
+  tags: string[]; //доступные теги
+}
 
 export const Card = ({
     card,
     onDeleteCard,
     onEditCardTitle,
     onAddTask,
-    onDragStart,
-    onDrop,
-    onTaskDragStart,
-    onTaskDrop,
-    onTaskDragOver,
     onEditTask,
     onDeleteTask,
     onToggleTag,
     activeDropdown,
     onDropdownToggle,
     tags
-}:any) => {
-    const [editCardId, setEditCardId] = useState(null);
+}: CardProps) => {
+
+    //состояния для редактирования заголовка карты
+    const [editCardId, setEditCardId] = useState<number | null>(null);
     const [editCardTitle, setEditCardTitle] = useState('');
 
-    const handleCardTitleClick = () => {
+    const {
+        attributes,
+        listeners,
+        setNodeRef,
+        transform,
+        transition,
+        isDragging,
+    } = useSortable({
+        id: card.id,
+        data: {
+            type: 'card',
+            card: card
+        }
+    });
+    //стили для перемещения
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    };
+
+    //редактирование карты
+    const handleCardTitleClick = (e: any) => {
+        e.stopPropagation(); // чтобы не сработало перемещение
         setEditCardId(card.id);
         setEditCardTitle(card.title);
     };
 
+    //сохранения исправленного заголовка карты
     const saveCardTitle = () => {
         if (editCardTitle.trim() === '' || editCardId === null) return;
         onEditCardTitle(editCardId, editCardTitle.trim());
         setEditCardId(null);
     };
 
+    //сохранения заголовка когда переключается на что то другое
     const handleInputBlur = () => {
         saveCardTitle();
     };
 
+    // сохранения по кнопке Enter
     const handleKeyPress = (e: any) => {
         if (e.key === 'Enter') {
             saveCardTitle();
         }
     };
 
-    const handleTaskDropSameCard = (e: any, taskId?: number) => {
-        onTaskDrop(e, card.id, taskId);
+    //открытие/закрытие выпадающего меню
+    const handleDropdownClick = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDropdownToggle('card', card.id, e);
+    };
+
+    //удаление карты
+    const handleDeleteCard = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDeleteCard(card.id);
+    };
+
+    //добавления задач
+    const handleAddTask = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+        onAddTask(card.id);
+    };
+    //чтобы можно было спокойно переменовать и ничего не начало перемещаться 
+    const handleInputClick = (e: any) => {
+        e.stopPropagation();
     };
 
     return (
         <div 
+            ref={setNodeRef}
+            style={style}
             className="card" 
-            draggable
-            onDragStart={() => onDragStart(card.id)}
-            onDragOver={(e) => {
-                e.preventDefault();
-                onTaskDragOver(e, card.id);
-            }}
-            onDrop={(e) => {
-                onDrop(e, card.id);
-                onTaskDrop(e, card.id);
-            }}
-            onClick={(e) => e.stopPropagation()}
         >
             <div className="card_header d-flex justify-content-between align-items-center flex-row">
                 <div className="card_title d-flex flex-row">
@@ -71,66 +132,68 @@ export const Card = ({
                                 onChange={(e) => setEditCardTitle(e.target.value)}
                                 onBlur={handleInputBlur}
                                 onKeyDown={handleKeyPress}
+                                onClick={handleInputClick}
                                 autoFocus
                             />
                         </div>
                     ) : (
-                        <h1 onClick={handleCardTitleClick}>{card.title}</h1>
+                        <h1 
+                            onClick={handleCardTitleClick}
+                            style={{ cursor: 'pointer' }}
+                            {...attributes}
+                            {...listeners}
+                        >
+                            {card.title}
+                        </h1>
                     )}
                 </div>
                 <div className="options">
                     <div className="dropdown">
                         <button 
                             type="button" 
+                            className=""
                             aria-expanded={activeDropdown === `card-${card.id}`}
-                            onClick={(e) => onDropdownToggle('card', card.id, e)}
+                            onClick={handleDropdownClick} 
+                            style={{fontSize:'10px'}}
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="25" fill="none" viewBox="0 0 256 256">
-                                <path d="M144,128a16,16,0,1,1-16-16A16,16,0,0,1,144,128ZM60,112a16,16,0,1,0,16,16A16,16,0,0,0,60,112Zm136,0a16,16,0,1,0,16,16A16,16,0,0,0,196,112Z"></path>
-                            </svg>
+                            •••
                         </button>
-                        <ul className={`dropdown-menu ${activeDropdown === `card-${card.id}` ? 'show' : ''}`}>
-                            <li>
-                                <div 
-                                    className="dropdown-item" 
-                                    onClick={(e) => { 
-                                        e.stopPropagation(); 
-                                        onDeleteCard(card.id); 
-                                    }}
-                                >
-                                    Удалить
-                                </div>
-                            </li>
-                        </ul>
+                        <div className={`dropdown-menu ${activeDropdown === `card-${card.id}` ? 'show' : ''}`}>
+                            <button 
+                                className="dropdown-item" 
+                                onClick={handleDeleteCard}
+                                type="button"
+                            >
+                                Удалить
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
+            
             <div className="tasks_area">
-                <div 
-                    className="drop"
-                    onDragOver={(e) => onTaskDragOver(e, card.id)}
-                    onDrop={(e) => onTaskDrop(e, card.id)}
-                ></div>
-                {card.tasks && card.tasks.length > 0 ? (
-                    <div className="tasks-list">
-                        {card.tasks.map((task:any) => (
+            {card.tasks && card.tasks.length > 0 ? (
+                <div className="tasks-list">
+                    <SortableContext 
+                        items={card.tasks.map(task => task.id)} 
+                        strategy={verticalListSortingStrategy}
+                    >
+                        {card.tasks.map((task) => (
                             <Task
                                 key={task.id}
                                 task={task}
+                                cardId={card.id}
                                 onEditTask={onEditTask}
                                 onDeleteTask={onDeleteTask}
                                 onToggleTag={onToggleTag}
-                                onDragStart={onTaskDragStart}
-                                onDrop={handleTaskDropSameCard}
-                                onDragOver={onTaskDragOver}
-                                cardId={card.id}
                                 activeDropdown={activeDropdown}
-                                onDropdownToggle={(taskId:any, e:any) => onDropdownToggle('task', taskId, e)}
+                                onDropdownToggle={onDropdownToggle}
                                 tags={tags}
                             />
                         ))}
-                    </div>
-                ) : (
+                    </SortableContext>
+                </div>
+            ) : (
                     <div className="no-tasks">
                         <p>Добавьте задачи</p>
                     </div>
@@ -139,10 +202,7 @@ export const Card = ({
             <div className="add-task-footer d-flex">
                 <button
                     className="add-task-btn"
-                    onClick={(e) => {
-                        e.stopPropagation();
-                        onAddTask(card.id);
-                    }}
+                    onClick={handleAddTask}
                 >
                     + Добавить задачу
                 </button>

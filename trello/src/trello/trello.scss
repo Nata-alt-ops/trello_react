@@ -277,5 +277,47 @@ body{
             height: fit-content;
         }
     }
+
+.edit_input {
+  width: 100%;
+  
+  input {
+    width: 100% !important;
+    padding: 4px 8px !important;
+    font-size: 20px !important;
+    font-weight: 600 !important;
+    font-family: 'Inter', sans-serif !important;
+    color: #000 !important;
+    background: white !important;
+    border: 2px solid #007bff !important;
+    border-radius: 4px !important;
+    outline: none !important;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1) !important;
+    
+    &:focus {
+      border-color: #0056b3 !important;
+      box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25) !important;
+    }
+  }
+}
+.card {
+    cursor: default !important;
+}
+
+.task-item {
+    cursor: default !important;
+}
+
+.card_title h1,
+.task-title {
+    cursor: grab !important;
+  
+    &:active {
+        cursor: grabbing !important;
+    }
+}
+.card_title h1{
+    font-size: 20px;
+}
 }
 
