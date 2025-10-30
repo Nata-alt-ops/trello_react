@@ -170,7 +170,6 @@ export const Card = ({
                     </div>
                 </div>
             </div>
-            
             <div className="tasks_area">
             {card.tasks && card.tasks.length > 0 ? (
                 <div className="tasks-list">
