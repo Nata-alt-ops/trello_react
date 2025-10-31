@@ -71,6 +71,50 @@ export const Trello = () => {
                     tags: ['High Priority']
                 },
             ]
+        },
+        {
+            id: randomId(),
+            title: ' Well',
+            tasks: [
+                { 
+                    id: randomId(), 
+                    title: 'Тыквенны крем-суп', 
+                    tags: ['High Priority']
+                },
+            ]
+        },
+        {
+            id: randomId(),
+            title: 'Good',
+            tasks: [
+                { 
+                    id: randomId(), 
+                    title: 'Куринный суп', 
+                    tags: ['High Priority']
+                },
+            ]
+        },
+         {
+            id: randomId(),
+            title: 'Well Done',
+            tasks: [
+                { 
+                    id: randomId(), 
+                    title: 'Пельмени', 
+                    tags: ['High Priority']
+                },
+            ]
+        },
+         {
+            id: randomId(),
+            title: 'Well Done +',
+            tasks: [
+                { 
+                    id: randomId(), 
+                    title: 'Чизбургер', 
+                    tags: ['High Priority']
+                },
+            ]
         }
     ]);
 
