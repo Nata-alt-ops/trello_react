@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap/dist/js/bootstrap.bundle.min';
 import './trello.scss';
 import { Card } from "./Card";
 
-//импорты для dnd
-import{
+// Импорты для dnd
+import {
     DndContext,
     closestCenter,
     KeyboardSensor,
@@ -14,219 +14,57 @@ import{
     useSensors,
     DragOverlay,
     defaultDropAnimationSideEffects,
-    } 
-from '@dnd-kit/core';
+} from '@dnd-kit/core';
 import {
-    arrayMove,
     SortableContext,
     sortableKeyboardCoordinates,
     horizontalListSortingStrategy,
-    verticalListSortingStrategy,
-} 
-from '@dnd-kit/sortable';
+} from '@dnd-kit/sortable';
 
-type Task = {
-  id: number;
-  title: string;
-  tags: string[];
-}
-
-type CardType = {
-  id: number;
-  title: string;
-  tasks: Task[];
-}
+// Effector импорты
+import { useStore } from 'effector-react';
+import { 
+    $cards, 
+    moveCard,
+    deleteCard,
+    editCard,
+    addCard
+} from "./model/card";
+import { 
+    $tags, 
+    moveTask,
+    deleteTask,
+    toggleTag,
+    addTask,
+    editTask
+} from './model/task';
+import { 
+    $activeDropdown, 
+    dropdownToggled 
+} from "./ui";
+import type { CardType } from "./model/card/card";
+import type { Task } from "./model/task/task";
 
 export const Trello = () => {
-    //рандомные числа для id
-    const randomId = () => {
-        return Date.now() + Math.floor(Math.random() * 10000);
-    };
+    const cards = useStore($cards);
+    const tags = useStore($tags);
+    const activeDropdown = useStore($activeDropdown);
 
-    //тестовые данные
-    const [cards, setCards] = useState<CardType[]>([
-        {
-            id: randomId(),
-            title: 'To do',
-            tasks: [
-                { 
-                    id: randomId(), 
-                    title: 'Суши', 
-                    tags: ['Bug', 'Overdue', 'Urgent', 'Low Priority', 'High Priority']
-                },
-                { 
-                    id: randomId(), 
-                    title: 'Онигири', 
-                    tags: ['Low Priority']
-                }
-            ]
-        },
-        {
-            id: randomId(),
-            title: 'Done',
-            tasks: [
-                { 
-                    id: randomId(), 
-                    title: 'Шаурма', 
-                    tags: ['High Priority']
-                },
-            ]
-        },
-        {
-            id: randomId(),
-            title: ' Well',
-            tasks: [
-                { 
-                    id: randomId(), 
-                    title: 'Тыквенны крем-суп', 
-                    tags: ['High Priority']
-                },
-            ]
-        },
-        {
-            id: randomId(),
-            title: 'Good',
-            tasks: [
-                { 
-                    id: randomId(), 
-                    title: 'Куринный суп', 
-                    tags: ['High Priority']
-                },
-            ]
-        },
-         {
-            id: randomId(),
-            title: 'Well Done',
-            tasks: [
-                { 
-                    id: randomId(), 
-                    title: 'Пельмени', 
-                    tags: ['High Priority']
-                },
-            ]
-        },
-         {
-            id: randomId(),
-            title: 'Well Done +',
-            tasks: [
-                { 
-                    id: randomId(), 
-                    title: 'Чизбургер', 
-                    tags: ['High Priority']
-                },
-            ]
-        }
-    ]);
-
-    //теги
-    const tags = ['Bug', 'Overdue', 'Urgent', 'Low Priority', 'High Priority'];
-    const [activeDropdown, setActiveDropdown] = useState<string | null>(null);
-    
     // Dnd-kit состояния для карт и задач
     const [activeCard, setActiveCard] = useState<CardType | null>(null);
     const [activeTask, setActiveTask] = useState<Task | null>(null);
 
     // для управления на разных устройствах
     const sensors = useSensors(
-      useSensor(PointerSensor, {
-        activationConstraint: {
-          distance: 8,
-        },
-      }),
-      useSensor(KeyboardSensor, {
-        coordinateGetter: sortableKeyboardCoordinates,
-      })
+        useSensor(PointerSensor, {
+            activationConstraint: {
+                distance: 8,
+            },
+        }),
+        useSensor(KeyboardSensor, {
+            coordinateGetter: sortableKeyboardCoordinates,
+        })
     );
-
-    // Закрытие выпадающего списка при клике вне 
-    useEffect(() => {
-      const handleClickOutside = () => {
-        setActiveDropdown(null);
-      };
-
-      document.addEventListener('click', handleClickOutside);
-      return () => {
-        document.removeEventListener('click', handleClickOutside);
-      };
-    }, []);
-
-    // Основные функции для карт
-    const deleteCard = (id: number) => {
-        setCards(cards => cards.filter(card => card.id !== id));
-    };
-
-    const addCard = () => {
-        const newCard: CardType = {
-            id: randomId(),
-            title: `Card ${cards.length + 1}`,
-            tasks: []
-        };
-        setCards([...cards, newCard]);
-    };
- 
-    const editCardTitle = (cardId: number, newTitle: string) => {
-        setCards(prev =>
-            prev.map(card => 
-                card.id === cardId ? {...card, title: newTitle} : card
-            )
-        );
-    };
-
-    // Основные функции для задач
-    //добавление
-    const addTask = (cardId: number) => {
-        const newTask: Task = {
-            id: randomId(),
-            title: 'Новая задача',
-            tags: []
-        };
-
-        setCards(prev =>
-            prev.map(card =>
-                card.id === cardId
-                    ? { ...card, tasks: [...(card.tasks || []), newTask] }
-                    : card
-            )
-        );
-    };
-    //удаление
-    const deleteTask = (taskId: number) => {
-        setCards(prev =>
-            prev.map(card => ({
-                ...card,
-                tasks: card.tasks?.filter(task => task.id !== taskId) || []
-            }))
-        );
-    };
-    //редактирование
-    const editTask = (taskId: number, newTitle: string) => {
-        setCards(prev =>
-            prev.map(card => ({
-                ...card,
-                tasks: card.tasks?.map(task =>
-                    task.id === taskId ? { ...task, title: newTitle } : task
-                ) || []
-            }))
-        );
-    };
-    //теги
-    const toggleTag = (taskId: number, tag: string) => {
-        setCards(prev =>
-            prev.map(card => ({
-                ...card,
-                tasks: card.tasks?.map(task =>
-                    task.id === taskId
-                        ? {
-                            ...task,
-                            tags: task.tags?.includes(tag)
-                                ? task.tags.filter(t => t !== tag) 
-                                : [...(task.tags || []), tag] 
-                        }
-                        : task
-                ) || []
-            }))
-        );
-    };
 
     // Перемещение карт
     const handleCardDragStart = (event: any) => {
@@ -242,12 +80,7 @@ export const Trello = () => {
         }
 
         if (active.id !== over.id) {
-            setCards((items) => {
-                const oldIndex = items.findIndex((item) => item.id === active.id);
-                const newIndex = items.findIndex((item) => item.id === over.id);
-
-                return arrayMove(items, oldIndex, newIndex);
-            });
+            moveCard({ activeId: active.id, overId: over.id });
         }
 
         setActiveCard(null);
@@ -267,7 +100,6 @@ export const Trello = () => {
         }
 
         const activeTaskData = active.data.current?.task;
-        const overTaskData = over.data.current?.task;
         const overCardId = over.data.current?.cardId;
 
         if (!activeTaskData) {
@@ -278,92 +110,70 @@ export const Trello = () => {
         const sourceCardId = active.data.current?.cardId;
 
         if (over.data.current?.type === 'card') {
-       
             const targetCardId = over.id;
-
-            if (sourceCardId !== targetCardId) {
-                setCards(prev => 
-                    prev.map(card => {
-                        if (card.id === sourceCardId) {
-                            return {
-                                ...card,
-                                tasks: card.tasks?.filter(task => task.id !== active.id) || []
-                            };
-                        } else if (card.id === targetCardId) {
-                            return {
-                                ...card,
-                                tasks: [...(card.tasks || []), activeTaskData]
-                            };
-                        }
-                        return card;
-                    })
-                );
-            }
+            moveTask({
+                activeId: active.id,
+                overId: over.id,
+                sourceCardId,
+                targetCardId
+            });
         } else {
             const targetCardId = overCardId;
 
             if (sourceCardId === targetCardId) {
-             
-                setCards(prev => 
-                    prev.map(card => {
-                        if (card.id === sourceCardId && card.tasks) {
-                            const tasks = [...card.tasks];
-                            const oldIndex = tasks.findIndex(task => task.id === active.id);
-                            const newIndex = tasks.findIndex(task => task.id === over.id);
-
-                            if (oldIndex !== -1 && newIndex !== -1) {
-                                return { ...card, tasks: arrayMove(tasks, oldIndex, newIndex) };
-                            }
-                        }
-                        return card;
-                    })
-                );
-            } else {
                 const sourceCard = cards.find(c => c.id === sourceCardId);
-                const taskToMove = sourceCard?.tasks?.find(t => t.id === active.id);
-                const targetCard = cards.find(c => c.id === targetCardId);
+                if (sourceCard?.tasks) {
+                    const tasks = sourceCard.tasks;
+                    const oldIndex = tasks.findIndex(task => task.id === active.id);
+                    const newIndex = tasks.findIndex(task => task.id === over.id);
 
-                if (!taskToMove || !targetCard) {
-                    setActiveTask(null);
-                    return;
+                    if (oldIndex !== -1 && newIndex !== -1 && oldIndex !== newIndex) {
+                        moveTask({
+                            activeId: active.id,
+                            overId: over.id,
+                            sourceCardId,
+                            targetCardId,
+                            targetIndex: newIndex
+                        });
+                    }
                 }
-                let targetIndex = targetCard.tasks?.length || 0;
+            } else {
+                const targetCard = cards.find(c => c.id === targetCardId);
+                let targetIndex = targetCard?.tasks?.length || 0;
                 
-                if (overTaskData) {
-                    targetIndex = targetCard.tasks?.findIndex(task => task.id === over.id) || 0;
+                if (over.data.current?.task) {
+                    targetIndex = targetCard?.tasks?.findIndex(task => task.id === over.id) || 0;
                 }
-                setCards(prev => 
-                    prev.map(card => {
-                        if (card.id === sourceCardId) {
-                            
-                            return {
-                                ...card,
-                                tasks: card.tasks?.filter(task => task.id !== active.id) || []
-                            };
-                        } else if (card.id === targetCardId) {
-                            
-                            const newTasks = [...(card.tasks || [])];
-                            newTasks.splice(targetIndex, 0, taskToMove);
-                            return {
-                                ...card,
-                                tasks: newTasks
-                            };
-                        }
-                        return card;
-                    })
-                );
+                
+                moveTask({
+                    activeId: active.id,
+                    overId: over.id,
+                    sourceCardId,
+                    targetCardId,
+                    targetIndex
+                });
             }
         }
 
         setActiveTask(null);
     };
 
-    //чтобы выпадающее меню в картах или задач открывалось/закрывалось
+    const handleEditCard = (cardId: number, newTitle: string) => {
+        editCard({ cardId, newTitle });
+    };
+
+    const handleEditTask = (taskId: number, newTitle: string) => {
+        editTask({ taskId, newTitle });
+    };
+
+    const handleToggleTag = (taskId: number, tag: string) => {
+        toggleTag({ taskId, tag });
+    };
+
     const handleDropdownToggle = (type: 'card' | 'task', id: number, e: any) => {
         e.preventDefault();
         e.stopPropagation();
-        const dropdownId = `${type}-${id}`;
-        setActiveDropdown(activeDropdown === dropdownId ? null : dropdownId);
+        dropdownToggled({ type, id });
     };
 
     //анимация перемещения
@@ -407,18 +217,18 @@ export const Trello = () => {
                                 key={cardItem.id}
                                 card={cardItem}
                                 onDeleteCard={deleteCard}
-                                onEditCardTitle={editCardTitle}
+                                onEditCardTitle={handleEditCard}
                                 onAddTask={addTask}
-                                onEditTask={editTask}
+                                onEditTask={handleEditTask}
                                 onDeleteTask={deleteTask}
-                                onToggleTag={toggleTag}
+                                onToggleTag={handleToggleTag}
                                 activeDropdown={activeDropdown}
                                 onDropdownToggle={handleDropdownToggle}
                                 tags={tags}
                             />
                         ))}
                         <div className="add_card">
-                            <button onClick={addCard}>+</button>
+                            <button onClick={() => addCard()}>+</button>
                         </div>
                     </div>
                 </SortableContext>
